@@ -1,3 +1,15 @@
+/*
+   Cancelamento de thread.
+   - O.S pode ou não terminar ela imediatamente.
+   - Tem dois tipos de cancelamento: deferida ou assincrona.
+   - Na forma assincrona que é feito nesse exemplo, o pedido de cancelamento é enfileirado
+     pelo sistema operacional. 
+   - Tendo recebido o pedido de cancelamento, o sistema ira "procurar" por uma oportunidade 
+     para terminar a thread.
+
+    compilação: gcc-11 -std=c11 master_worker.c -o master_worker -lpthread (openSuse)
+*/
+
 #include<pthread.h>
 #include<stdio.h>
 #include<stdlib.h>
@@ -10,6 +22,9 @@
 pthread_t worker_thread[WORKERS_QTD];
 
 void *write_file(void *param){
+
+    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, 0); /* permite ela ser cancelada */
+    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, 0); /* modo de cancelamento */
 
     char file[NAME_SIZE];
     char text_to_write[100];
@@ -62,6 +77,7 @@ int main(void){
         switch (choice)
         {
         case 1: 
+            pthread_cancel(worker_thread[thread_number]);
             break;
         
         default:
