@@ -21,6 +21,18 @@
 #define NAME_SIZE 255
 pthread_t worker_thread[WORKERS_QTD];
 
+void free_memory(void* ptr){
+    printf("%s invoked...\n", __FUNCTION__);    
+    if(ptr != NULL){
+        free(ptr);
+    }
+}
+
+void close_file_descriptor(void* file_ptr){
+    printf("%s invoked...\n", __FUNCTION__);
+    fclose((FILE *)file_ptr);
+}
+
 void *write_file(void *param){
 
     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, 0); /* permite ela ser cancelada */
@@ -32,13 +44,17 @@ void *write_file(void *param){
     int lenght = 0;
     short *thread_identifier = (short *)param;
 
-    sprintf(file, "thread_%hi.text", *thread_identifier);
-    FILE *file_ptr = fopen(file, "w");
+    pthread_cleanup_push(free_memory, (void *)thread_identifier);
 
+    sprintf(file, "file_%hi.text", *thread_identifier);
+    FILE *file_ptr = fopen(file, "w");
+    
     if(file_ptr == NULL){
         fprintf(stderr, "[+]Erro %d ao abrir arquivo\n", errno);
         exit(-1);
     }
+
+    pthread_cleanup_push(close_file_descriptor, (void *)file_ptr);
 
     while(true){
         lenght = sprintf(text_to_write, "%d : Thread Número(identificador): %hi\n", counter++, *thread_identifier);
@@ -47,6 +63,8 @@ void *write_file(void *param){
         sleep(2);
     }
 
+    pthread_cleanup_pop(0);
+    pthread_cleanup_pop(0);
     return 0;
 }
 
