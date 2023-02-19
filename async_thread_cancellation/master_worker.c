@@ -22,14 +22,12 @@
 pthread_t worker_thread[WORKERS_QTD];
 
 void free_memory(void* ptr){
-    printf("%s invoked...\n", __FUNCTION__);    
     if(ptr != NULL){
         free(ptr);
     }
 }
 
 void close_file_descriptor(void* file_ptr){
-    printf("%s invoked...\n", __FUNCTION__);
     fclose((FILE *)file_ptr);
 }
 
