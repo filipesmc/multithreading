@@ -49,7 +49,7 @@ void *write_file(void *param){
     
     if(file_ptr == NULL){
         fprintf(stderr, "[+]Erro %d ao abrir arquivo\n", errno);
-        exit(-1);
+        pthread_exit(0);
     }
 
     pthread_cleanup_push(close_file_descriptor, (void *)file_ptr);
